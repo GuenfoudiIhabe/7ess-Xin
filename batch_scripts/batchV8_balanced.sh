@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --job-name=SA_optimizedV6
+#SBATCH --job-name=SA_balancedV8
 #SBATCH --nodes=1                    
 #SBATCH --ntasks-per-node=1       
 #SBATCH --cpus-per-task=16
@@ -36,15 +36,15 @@ else
     exit 1
 fi
 
-# Run with WandB integration - Optimized model based on experimental results
+# Run with WandB integration - Balanced width-depth architecture
 python -u main.py \
   --data_path "${PWD}/Sentiment140.csv" \
-  --output_dir model_output/V6_optimized \
+  --output_dir model_output/V8_balanced \
   --vocab_size 35000 \
-  --emb_dim 128 \
-  --stack_depth 6 \
-  --attn_heads 4 \
-  --ff_expansion 2 \
+  --emb_dim 192 \
+  --stack_depth 5 \
+  --attn_heads 6 \
+  --ff_expansion 3 \
   --max_len 148 \
   --dropout 0.1 \
   --batch_size 64 \
@@ -53,5 +53,5 @@ python -u main.py \
   --random_seed 42 \
   --use_wandb \
   --wandb_project 7ess-Xin \
-  --wandb_name V6_optimized_model \
+  --wandb_name V8_balanced_model \
   --wandb_entity gihabe290-university-of-li-ge

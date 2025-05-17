@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --job-name=SA_optimizedV6
+#SBATCH --job-name=SA_sequenceV10
 #SBATCH --nodes=1                    
 #SBATCH --ntasks-per-node=1       
 #SBATCH --cpus-per-task=16
@@ -36,22 +36,22 @@ else
     exit 1
 fi
 
-# Run with WandB integration - Optimized model based on experimental results
+# Run with WandB integration - Testing longer sequence length
 python -u main.py \
   --data_path "${PWD}/Sentiment140.csv" \
-  --output_dir model_output/V6_optimized \
+  --output_dir model_output/V10_sequence \
   --vocab_size 35000 \
   --emb_dim 128 \
   --stack_depth 6 \
   --attn_heads 4 \
   --ff_expansion 2 \
-  --max_len 148 \
+  --max_len 256 \
   --dropout 0.1 \
-  --batch_size 64 \
+  --batch_size 48 \
   --learning_rate 5e-4 \
   --epochs 15 \
   --random_seed 42 \
   --use_wandb \
   --wandb_project 7ess-Xin \
-  --wandb_name V6_optimized_model \
+  --wandb_name V10_sequence_model \
   --wandb_entity gihabe290-university-of-li-ge

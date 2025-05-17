@@ -1,10 +1,10 @@
 #!/bin/bash
-#SBATCH --job-name=SA_optimizedV6
+#SBATCH --job-name=SA_extraDeepV7
 #SBATCH --nodes=1                    
 #SBATCH --ntasks-per-node=1       
 #SBATCH --cpus-per-task=16
 #SBATCH --mem=128G
-#SBATCH --time=48:00:00
+#SBATCH --time=72:00:00
 #SBATCH --gres=gpu:1
 #SBATCH --output=%x_%j.out
 #SBATCH --error=%x_%j.err
@@ -36,13 +36,13 @@ else
     exit 1
 fi
 
-# Run with WandB integration - Optimized model based on experimental results
+# Run with WandB integration - Testing extra deep architecture (8 layers)
 python -u main.py \
   --data_path "${PWD}/Sentiment140.csv" \
-  --output_dir model_output/V6_optimized \
+  --output_dir model_output/V7_extra_deep \
   --vocab_size 35000 \
   --emb_dim 128 \
-  --stack_depth 6 \
+  --stack_depth 8 \
   --attn_heads 4 \
   --ff_expansion 2 \
   --max_len 148 \
@@ -53,5 +53,5 @@ python -u main.py \
   --random_seed 42 \
   --use_wandb \
   --wandb_project 7ess-Xin \
-  --wandb_name V6_optimized_model \
+  --wandb_name V7_extra_deep_model \
   --wandb_entity gihabe290-university-of-li-ge

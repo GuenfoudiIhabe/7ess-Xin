@@ -1,0 +1,25 @@
+﻿# Large data files
+*.csv
+*.pkl
+*.pt
+*.bin
+
+# Directories
+/wandb/
+/model_output/
+/__pycache__/
+/saved_models/
+/expl/
+
+# Python files
+*.pyc
+*.pyo
+__pycache__/
+
+# Environment
+.env
+.venv
+env/
+venv/
+.idea/
+.vscode/

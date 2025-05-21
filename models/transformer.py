@@ -1,3 +1,17 @@
+# =============================================================================
+# REFERENCES
+#   [R1] Su J. et al., “RoFormer: Enhanced Transformer with Rotary Position Embedding”, 2021 – https://arxiv.org/abs/2104.09864        # :contentReference[oaicite:0]{index=0}
+#   [R2] lucidrains, *rotary-embedding-torch* (PyTorch RoPE reference impl.), 2021 – https://github.com/lucidrains/rotary-embedding-torch      # :contentReference[oaicite:1]{index=1}
+#   [R3] Vaswani A. et al., “Attention Is All You Need”, 2017 – https://arxiv.org/abs/1706.03762                                         # :contentReference[oaicite:2]{index=2}
+#   [R4] Pranay J., “Understanding Sinusoidal Positional Encoding in Transformers” (blog), 2024 – https://medium.com/p/26c4c161b7cc          # :contentReference[oaicite:3]{index=3}
+#   [R5] Community discussion, “Dot-product vs. cosine similarity in attention”, 2023 – https://www.reddit.com/r/learnmachinelearning/comments/1anyu2f/  # :contentReference[oaicite:4]{index=4}
+#   [R6] Harshit S., “Soft-max Temperature” (primer), 2022 – https://medium.com/p/5492e4007f71                                           # :contentReference[oaicite:5]{index=5}
+#   [R7] PyTorch Docs, `torch.nn.MultiheadAttention`, latest – https://pytorch.org/docs/stable/generated/torch.nn.MultiheadAttention.html   # :contentReference[oaicite:6]{index=6}
+#   [R8] Rezapour M., “Emotion Detection with Transformers: A Comparative Study”, 2024 – https://arxiv.org/abs/2403.15454                  # :contentReference[oaicite:7]{index=7}
+#   [R9] Milvus KB, “Why is mean pooling often used … to produce a sentence embedding”, 2024 – https://milvus.io/ai-quick-reference/why-is-mean-pooling-often-used-on-the-token-outputs-of-a-transformer-like-bert-to-produce-a-sentence-embedding  # :contentReference[oaicite:8]{index=8}
+#   [R10] Medium tutorial, “The Feed-forward Network (FFN) in the Transformer Model”, 2024 – https://medium.com/image-processing-with-python/the-feedforward-network-ffn-in-the-transformer-model-6bb6e0ff18db                                             # :contentReference[oaicite:9]{index=9}
+# =============================================================================
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F

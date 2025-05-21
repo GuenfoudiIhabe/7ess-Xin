@@ -7,6 +7,7 @@ import argparse
 import os
 import time
 from tqdm import tqdm
+import wandb
 
 from data.data_loader import load_sentiment140
 from data.preprocessing import refine_sentiment_dataset, build_subword_tokenizer, create_dataset_splits
@@ -30,6 +31,10 @@ def configure_training():
     cmd_parser.add_argument("--epochs", type=int, default=10)
     cmd_parser.add_argument("--subset_size", type=int, default=None)
     cmd_parser.add_argument("--random_seed", type=int, default=42)
+    cmd_parser.add_argument("--wandb_project", type=str, default="sentiment-analysis")
+    cmd_parser.add_argument("--wandb_name", type=str, default=None)
+    cmd_parser.add_argument("--wandb_entity", type=str, default=None)
+    cmd_parser.add_argument("--use_wandb", action="store_true")
     return cmd_parser.parse_args()
 
 
@@ -155,6 +160,18 @@ def train_sentiment_model(model, train_texts, train_labels, val_texts, val_label
         metrics_log['val_acc'].append(val_scores['accuracy'])
         metrics_log['val_f1'].append(val_scores['f1'])
         
+        # Log metrics to wandb
+        if config.use_wandb:
+            wandb.log({
+                "train_loss": mean_train_loss,
+                "train_accuracy": train_scores['accuracy'],
+                "train_f1": train_scores['f1'],
+                "val_loss": mean_val_loss,
+                "val_accuracy": val_scores['accuracy'],
+                "val_f1": val_scores['f1'],
+                "epoch": epoch
+            })
+        
         epoch_time = time.time() - epoch_start
         print(f"Epoch {epoch+1}/{config.epochs} - {epoch_time:.2f}s - "
               f"Train: loss={mean_train_loss:.4f}, acc={train_scores['accuracy']:.4f} - "
@@ -171,6 +188,10 @@ def train_sentiment_model(model, train_texts, train_labels, val_texts, val_label
                 'val_f1': best_f1,
                 'config': vars(config)
             }, checkpoint_path)
+            
+            if config.use_wandb:
+                wandb.run.summary["best_val_f1"] = best_f1
+                wandb.run.summary["best_epoch"] = epoch
             
             print(f"New best model saved, F1={best_f1:.4f}")
     
@@ -221,11 +242,27 @@ def evaluate_test_set(model, test_texts, test_labels, tokenizer, config, device)
     print(f"Recall: {results['recall']:.4f}")
     print(f"F1 Score: {results['f1']:.4f}")
     
+    if config.use_wandb:
+        wandb.run.summary.update({
+            "test_accuracy": results['accuracy'],
+            "test_precision": results['precision'],
+            "test_recall": results['recall'],
+            "test_f1": results['f1']
+        })
+    
     return results
 
 
 def run_pipeline():
     config = configure_training()
+    
+    if config.use_wandb:
+        wandb.init(
+            project=config.wandb_project,
+            name=config.wandb_name,
+            entity=config.wandb_entity,
+            config=vars(config)
+        )
     
     torch.manual_seed(config.random_seed)
     np.random.seed(config.random_seed)
@@ -237,6 +274,10 @@ def run_pipeline():
     raw_data = load_sentiment140(config.data_path)
     processed_data = refine_sentiment_dataset(raw_data, config.subset_size)
     print(f"Dataset ready: {len(processed_data)} entries")
+    
+    # Determine number of classes in the dataset
+    num_classes = processed_data['sentiment'].nunique()
+    print(f"Detected {num_classes} sentiment classes in the dataset")
     
     print("\nBuilding tokenizer...")
     tokenizer = build_subword_tokenizer(processed_data['normalized_text'].tolist(), config.vocab_size)
@@ -259,11 +300,13 @@ def run_pipeline():
         attn_heads=config.attn_heads,
         ff_expansion=config.ff_expansion // 2,  # Convert to expansion factor
         max_len=config.max_len,
-        dropout=config.dropout
+        dropout=config.dropout,
+        num_classes=num_classes  # Pass detected number of classes
     ).to(device)
     
     print(f"Model architecture:")
     print(f"- Vocabulary size: {len(tokenizer.token_map)}")
+    print(f"- Number of classes: {num_classes}")
     print(f"- Embedding dimension: {config.emb_dim}")
     print(f"- Encoder layers: {config.stack_depth}")
     print(f"- Attention heads: {config.attn_heads}")
@@ -297,6 +340,9 @@ def run_pipeline():
         config=config,
         device=device
     )
+    
+    if config.use_wandb:
+        wandb.finish()
     
     print(f"\nTraining complete, model saved to: {config.output_dir}")
 
